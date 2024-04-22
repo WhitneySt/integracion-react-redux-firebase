@@ -11,22 +11,22 @@ const userAuthSlice = createSlice({
     name: 'userAuth',
     initialState: initialUser,
     reducers: {
-        login: (state, action) => {
+        loginSuccess: (state, action) => {
             state.user = action.payload;
             state.isAuth = true;
             state.isLoading = false;
             state.error = null;
         },
-        setIsLoading: (state) => {
+        loginRequest: (state) => {
             state.isLoading = true;
             state.error = null;
         },
-        setError: (state, action) => {
+        loginFail: (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
         }
     }
 });
 
-export const { login, setIsLoading, setError} = userAuthSlice.actions;
+export const { loginSuccess, loginRequest, loginFail } = userAuthSlice.actions;
 export default userAuthSlice.reducer
