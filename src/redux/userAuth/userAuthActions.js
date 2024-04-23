@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { loginFail, loginRequest, loginSuccess } from "./userAuthSlice";
 import { auth } from "../../Firebase/firebaseConfig";
 
@@ -28,3 +28,21 @@ export const actionRegisterWithEmailAndPassword = ({ email, password, name, phot
     }
   };
 };
+
+export const actionLoginWithEmailAndPassword = ({email, password}) => {
+  return async (dispatch) => {
+    dispatch(loginRequest());
+    try {
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      dispatch(loginSuccess({
+        id: user.uid,
+        name: user.displayName,
+        photo: user.photoURL,
+        accessToken: user.accessToken
+      }))
+    } catch (error) {
+      console.error(error);
+      dispatch(loginFail(error.message))
+    }
+  }
+}
