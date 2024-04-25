@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
+import { useNavigate } from 'react-router-dom';
 import * as Yup from "yup";
 import imagePhoto from "../../assets/photo-camera_711191.png";
 import imageUser from "../../assets/user_709618.png";
@@ -9,6 +10,8 @@ import imagePassword from "../../assets/lock_8472244.png";
 import "./register.scss";
 import fileUpload from "../../services/fileUpload";
 import { actionRegisterWithEmailAndPassword } from "../../redux/userAuth/userAuthActions";
+import Swal from 'sweetalert2';
+import Cargando from "../../componets/Cargando/Cargando";
 
 const passwordRegex =
   /^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/;
@@ -18,6 +21,8 @@ const initialImage =
 
 const Register = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {isAuth, isLoading, error} = useSelector((store) => store.userAuth);
   const [image, setImage] = useState(initialImage);
   const [file, setFile] = useState(null);
 
@@ -67,22 +72,46 @@ const Register = () => {
     },
   });
 
+  if(isLoading) return (
+    <Cargando/>
+  );
+
+  if (error) {
+    Swal.fire({
+      title: "Oops!",
+      text: "Ha ocurrido un error en la creación de la cuenta",
+      icon: "error",
+    });
+  }
+
+  if (isAuth) {
+    Swal.fire({
+      title: "Excelente!",
+      text: "Has creado con éxito una cuenta",
+      icon: "success",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate('/');
+      }
+    })
+  }
+
   return (
     <main className="register">
       <figure className="register__image">
         <img src={image} alt="avatar" />
       </figure>
-      <label htmlFor="photo">
-        <img src={imagePhoto} alt="photo" />
-        <input
-          type="file"
-          name=""
-          id="photo"
-          onChange={handleChangeFile}
-          // {...formik.getFieldProps("photo")}
-        />
-      </label>
       <form onSubmit={formik.handleSubmit}>
+        <label htmlFor="photo">
+          <img src={imagePhoto} alt="photo" />
+          <input
+            type="file"
+            name=""
+            id="photo"
+            onChange={handleChangeFile}
+            // {...formik.getFieldProps("photo")}
+          />
+        </label>
         <label htmlFor="name">
           <img src={imageUser} alt="name" />
           <input

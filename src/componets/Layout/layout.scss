@@ -18,8 +18,8 @@
     right: 0;
     bottom: 0;
     left: 0;
-    // background-color: #262f3d56;    
-    backdrop-filter: blur(10px);    
-    z-index: -1; /* Coloca el pseudo-elemento detrás del contenido */
+    background-color: #7288a17c;    
+    //backdrop-filter: blur(10px);    
+    z-index: 1; /* Coloca el pseudo-elemento detrás del contenido */
   }
 }
