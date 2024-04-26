@@ -10,6 +10,9 @@ import imagePassword from "../../assets/lock_8472244.png";
 import "./login.scss";
 import { actionLoginWithEmailAndPassword } from "../../redux/userAuth/userAuthActions";
 import Cargando from "../../componets/Cargando/Cargando";
+import ProvidersLogin from "../../componets/ProvidersLogin/ProvidersLogin";
+import { loginProviders } from "../../data/loginProviders";
+import { logout } from "../../redux/userAuth/userAuthSlice";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -40,6 +43,8 @@ const Login = () => {
       title: "Oops!",
       text: "Ha ocurrido un error en el inicio de sesión, por favor verifica tus credenciales",
       icon: "error",
+    }).then((result) => {
+      if(result.isConfirmed) dispatch(logout());
     });
   }
 
@@ -99,6 +104,15 @@ const Login = () => {
         >
           Registrarse
         </button>
+        {loginProviders.map((item, index) => (
+          <ProvidersLogin
+            key={index}
+            name={item.name}
+            image={item.image}
+            colorButton={item.colorButton}
+            provider={item.provider}
+          />
+        ))}
       </form>
     </main>
   );

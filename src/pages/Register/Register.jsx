@@ -12,6 +12,7 @@ import fileUpload from "../../services/fileUpload";
 import { actionRegisterWithEmailAndPassword } from "../../redux/userAuth/userAuthActions";
 import Swal from 'sweetalert2';
 import Cargando from "../../componets/Cargando/Cargando";
+import { logout } from "../../redux/userAuth/userAuthSlice";
 
 const passwordRegex =
   /^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/;
@@ -81,6 +82,8 @@ const Register = () => {
       title: "Oops!",
       text: "Ha ocurrido un error en la creación de la cuenta",
       icon: "error",
+    }).then((result) => {
+      if (result.isConfirmed) dispatch(logout());
     });
   }
 

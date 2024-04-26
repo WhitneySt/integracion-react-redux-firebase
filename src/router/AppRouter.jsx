@@ -11,6 +11,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../Firebase/firebaseConfig";
 import { loginRequest, loginSuccess } from "../redux/userAuth/userAuthSlice";
 import Cargando from "../componets/Cargando/Cargando";
+import PhoneLogin from "../pages/PhoneLogin/PhoneLogin";
+import InsertCode from "../pages/InsertCode/InsertCode";
 
 const AppRouter = () => {
   const { user } = useSelector((store) => store.userAuth);
@@ -25,6 +27,8 @@ const AppRouter = () => {
             name: userCredential.displayName,
             photo: userCredential.photoURL,
             accessToken: userCredential.accessToken,
+            email: userCredential.email || null,
+            phone: userCredential.phoneNumber || null,
           })
         );
       }
@@ -42,6 +46,8 @@ const AppRouter = () => {
           <Route element={<PublicRoutes />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="phone" element={<PhoneLogin />} />
+            <Route path="phone/insertCode/:phone" element={<InsertCode />} />
             {/* Aquí van el resto de rutas públicas */}
           </Route>
         </Route>
