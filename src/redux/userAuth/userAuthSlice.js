@@ -34,5 +34,5 @@ const userAuthSlice = createSlice({
   },
 });
 
-export const { loginSuccess, loginRequest, loginFail, logout } = userAuthSlice.actions;
-export default userAuthSlice.reducer;
+export const { loginSuccess, loginRequest, loginFail, logout } = userAuthSlice.actions; //Creator actions
+export default userAuthSlice.reducer; //Función reductora
