@@ -7,6 +7,7 @@ const mascotasSlice = createSlice({
     isLoadingMascotas: false,
     errorMascotas: null,
     successRequest: null,
+    isactiveFilter: false
   },
   reducers: {
     mascotasRequest: (state) => {
@@ -19,6 +20,7 @@ const mascotasSlice = createSlice({
       state.isLoadingMascotas = false;
       state.errorMascotas = null;
       state.successRequest = true;
+      state.isactiveFilter = false;
     },
     mascotasFail: (state, action) => {
       (state.isLoadingMascotas = false),
@@ -28,7 +30,7 @@ const mascotasSlice = createSlice({
     addMascotas: (state, action) => {
       state.mascotas.push(action.payload);
       state.isLoadingMascotas = false;
-      state.successRequest = true;
+      state.successRequest = "addMascotas";
     },
     editMascota: (state, action) => {
       state.isLoadingMascotas = false;
@@ -46,6 +48,13 @@ const mascotasSlice = createSlice({
     },
     setSuccessRequest: (state) => {
       state.successRequest = null;
+    },
+    filterMascotas: (state, action) => {
+      state.mascotas = action.payload;
+      state.isLoadingMascotas = false;
+      state.errorMascotas = null;
+      state.successRequest = true;
+      state.isactiveFilter = true;
     }
   },
 });
@@ -58,6 +67,7 @@ export const {
   editMascota,
   deleteMascota,
   setSuccessRequest,
+  filterMascotas,
 } = mascotasSlice.actions; //Creators action
 
 export default mascotasSlice.reducer; //La función reductora

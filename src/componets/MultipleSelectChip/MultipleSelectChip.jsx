@@ -29,19 +29,26 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectChip({ personalidades = [], labelName = "",value='', handleChange, label=''  }) {
+export default function MultipleSelectChip({
+  personalidades = [],
+  labelName = "",
+  value = "",
+  handleChange,
+  label = "",
+  disabled,
+}) {
   const theme = useTheme();
-//   const [personName, setPersonName] = React.useState([]);
+  //   const [personName, setPersonName] = React.useState([]);
 
-//   const handleChange = (event) => {
-//     const {
-//       target: { value },
-//     } = event;
-//     setPersonName(
-//       // On autofill we get a stringified value.
-//       typeof value === "string" ? value.split(",") : value
-//     );
-//   };
+  //   const handleChange = (event) => {
+  //     const {
+  //       target: { value },
+  //     } = event;
+  //     setPersonName(
+  //       // On autofill we get a stringified value.
+  //       typeof value === "string" ? value.split(",") : value
+  //     );
+  //   };
 
   return (
     <div>
@@ -54,6 +61,7 @@ export default function MultipleSelectChip({ personalidades = [], labelName = ""
           multiple
           value={value}
           onChange={handleChange}
+          disabled={disabled}
           input={<OutlinedInput id="select-multiple-chip" label={labelName} />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

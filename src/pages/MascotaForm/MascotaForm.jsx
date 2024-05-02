@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleSelectChip from "../../componets/MultipleSelectChip/MultipleSelectChip";
@@ -24,9 +24,11 @@ const MascotaForm = () => {
     "https://www.shutterstock.com/image-photo/portrait-cat-dog-front-bright-260nw-1927527212.jpg"
   );
   const [file, setFile] = useState(null);
+  const [showInput, setShowInput] = useState(false);
   const { successRequest, errorMascotas, isLoadingMascotas } = useSelector(
     (store) => store.mascotas
   );
+  const { user:{id} } = useSelector(store => store.userAuth);
 
   const handleChangeFile = (event) => {
     const fileItem = event.target.files[0];
@@ -46,9 +48,15 @@ const MascotaForm = () => {
     onSubmit: async (values) => {
       const avatar = await fileUpload(file);
       values.imagen = avatar;
+      values.idTenedor = id
       dispatch(actionAddMascota(values));
     },
   });
+
+  useEffect(() => {
+    const lastIndex = formik.values.personalidad2.length - 1; //Posición del último elemento dentro del array personalidad2
+    if (formik.values.personalidad2[lastIndex] === "otros") setShowInput(true);
+  }, [formik.values.personalidad2]);
 
   if (isLoadingMascotas) return <Cargando />;
 
@@ -60,7 +68,7 @@ const MascotaForm = () => {
     });
   }
 
-  if (successRequest) {
+  if (successRequest==='addMascotas') {
     Swal.fire({
       title: "Excelente!",
       text: "Has guardado con éxito una mascota para adoptar",
@@ -133,7 +141,24 @@ const MascotaForm = () => {
           label={"personalidad2"}
           value={formik.values.personalidad2}
           handleChange={formik.handleChange}
+          disabled={showInput}
         />
+        {showInput ? (
+          <label htmlFor="otro">
+            <span>Otra personalidad:</span>
+            <input
+              type="text"
+              id="otro"
+              placeholder="Ingrese una personalidad"
+              onChange={(event) => {
+                const { value } = event.target;
+                const lastIndex = formik.values.personalidad2.length - 1;
+                formik.values.personalidad2[lastIndex] = value;
+              }}
+            />
+            <button onClick={()=>setShowInput(false)}>Aceptar</button>
+          </label>
+        ) : null}
         <RadioButtonsGroup
           options={genero}
           label="Género"
