@@ -10,25 +10,59 @@ import {
 import imageUpload from "../../assets/upload_9427985.png";
 import RadioButtonsGroup from "../../componets/RadioButtonsGroup/RadioButtonsGroup";
 import { useFormik } from "formik";
+import { useParams } from "react-router-dom";
 import "./mascotasForm.scss";
 import fileUpload from "../../services/fileUpload";
-import { actionAddMascota } from "../../redux/mascotas/mascotasActions";
+import {
+  actionAddMascota,
+  actionEditMascotas,
+} from "../../redux/mascotas/mascotasActions";
 import Cargando from "../../componets/Cargando/Cargando";
 import Swal from "sweetalert2";
 import { setSuccessRequest } from "../../redux/mascotas/mascotasSlice";
 
 const MascotaForm = () => {
+  const { idMascota } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [image, setImage] = useState(
     "https://www.shutterstock.com/image-photo/portrait-cat-dog-front-bright-260nw-1927527212.jpg"
   );
   const [file, setFile] = useState(null);
+  const [initalState, setInitialState] = useState({});
   const [showInput, setShowInput] = useState(false);
-  const { successRequest, errorMascotas, isLoadingMascotas } = useSelector(
-    (store) => store.mascotas
-  );
-  const { user:{id} } = useSelector(store => store.userAuth);
+  const { successRequest, errorMascotas, isLoadingMascotas, mascotas } =
+    useSelector((store) => store.mascotas);
+  const {
+    user: { id },
+  } = useSelector((store) => store.userAuth);
+
+  useEffect(() => {
+    if (idMascota) {
+      const editMascota = mascotas.find((item) => item.id === idMascota);
+      if (editMascota) {
+        setInitialState(editMascota);
+        setImage(editMascota.imagen);
+        formik.values.name = editMascota.name;
+        formik.values.edad = editMascota.edad;
+        formik.values.raza = editMascota?.raza || "";
+        formik.values.personalidad1 = editMascota.personalidad1;
+        formik.values.personalidad2 = editMascota.personalidad2;
+        formik.values.genero = editMascota.genero;
+        formik.values.tipoMascota = editMascota.tipoMascota;
+      }
+    }
+  }, [idMascota, mascotas]);
+
+  const getInitialValues = () => ({
+    name: initalState.name || "",
+    edad: initalState.edad || "",
+    raza: initalState.raza || "",
+    personalidad1: initalState.personalidad1 || "",
+    personalidad2: initalState.personalidad2 || [],
+    genero: initalState.genero || genero[0],
+    tipoMascota: initalState.tipoMascota || tipoMascota[0],
+  });
 
   const handleChangeFile = (event) => {
     const fileItem = event.target.files[0];
@@ -37,19 +71,18 @@ const MascotaForm = () => {
   };
 
   const formik = useFormik({
-    initialValues: {
-      name: "",
-      edad: "",
-      personalidad1: "",
-      personalidad2: [],
-      genero: genero[0],
-      tipoMascota: tipoMascota[0],
-    },
+    initialValues: getInitialValues(),
     onSubmit: async (values) => {
-      const avatar = await fileUpload(file);
+      const avatar = file ? await fileUpload(file) : image;
       values.imagen = avatar;
-      values.idTenedor = id
-      dispatch(actionAddMascota(values));
+      if (idMascota) {
+        //Vamos a editar
+        dispatch(actionEditMascotas(idMascota, values));
+      } else {
+        //Vamos a agregar
+        values.idTenedor = id;
+        dispatch(actionAddMascota(values));
+      }
     },
   });
 
@@ -63,15 +96,19 @@ const MascotaForm = () => {
   if (errorMascotas) {
     Swal.fire({
       title: "Oops!",
-      text: "Ha ocurrido un error en la creación de la mascota",
+      text: idMascota
+        ? "Ha ocurrido un error en la edición de los datos de la mascota"
+        : "Ha ocurrido un error en la creación de la mascota",
       icon: "error",
     });
   }
 
-  if (successRequest==='addMascotas') {
+  if (successRequest === "addMascotas" || successRequest === "editMascotas") {
     Swal.fire({
       title: "Excelente!",
-      text: "Has guardado con éxito una mascota para adoptar",
+      text: idMascota
+        ? "Has editado con éxito los datos de la mascota"
+        : "Has guardado con éxito una mascota para adoptar",
       icon: "success",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -80,12 +117,13 @@ const MascotaForm = () => {
       }
     });
   }
+
   return (
     <main className="form">
       <button className="back" onClick={() => navigate(-1)} type="button">
         Ir atrás
       </button>
-      <h1>Agregar Mascota</h1>
+      <h1>{idMascota ? "Editar Mascota" : "Agregar Mascota"}</h1>
       <form onSubmit={formik.handleSubmit}>
         <label htmlFor="name">
           <span>Nombre</span>
@@ -93,7 +131,9 @@ const MascotaForm = () => {
             id="name"
             type="text"
             placeholder="Loki"
-            {...formik.getFieldProps("name")}
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            // {...formik.getFieldProps("name")}
           />
         </label>
         <label htmlFor="edad">
@@ -107,7 +147,12 @@ const MascotaForm = () => {
         </label>
         <label htmlFor="raza">
           <span>Raza</span>
-          <input id="raza" type="text" placeholder="Labrador" />
+          <input
+            id="raza"
+            type="text"
+            placeholder="Labrador"
+            {...formik.getFieldProps("raza")}
+          />
         </label>
         <label htmlFor="imagen">
           <span>Foto</span>
@@ -156,7 +201,7 @@ const MascotaForm = () => {
                 formik.values.personalidad2[lastIndex] = value;
               }}
             />
-            <button onClick={()=>setShowInput(false)}>Aceptar</button>
+            <button onClick={() => setShowInput(false)}>Aceptar</button>
           </label>
         ) : null}
         <RadioButtonsGroup
@@ -173,7 +218,9 @@ const MascotaForm = () => {
           value={formik.values.tipoMascota}
           handleChange={formik.handleChange}
         />
-        <button type="submit">Guardar Mascota</button>
+        <button type="submit">
+          {idMascota ? "Editar" : "Guardar Mascota"}
+        </button>
       </form>
     </main>
   );

@@ -37,7 +37,7 @@ const mascotasSlice = createSlice({
       state.mascotas = state.mascotas.map((item) =>
         action.payload.id == item.id ? { ...item, ...action.payload } : item
       );
-      state.successRequest = true;
+      state.successRequest = "editMascotas";
     },
     deleteMascota: (state, action) => {
       state.isLoadingMascotas = false;

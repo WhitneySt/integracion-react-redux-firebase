@@ -57,6 +57,7 @@ const AppRouter = () => {
         <Route element={<PrivateRoutes />}>
           <Route index element={<Home />} />
           <Route path="agregar-mascota" element={<MascotaForm />} />
+          <Route path="edit/:idMascota" element={<MascotaForm />} />
 
           {user?.role === "admin" ? (
             <>
